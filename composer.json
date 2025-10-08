@@ -1,6 +1,6 @@
 {
     "name": "kalimeromk/postal-tracking",
-    "description": "PHP package for tracking postal shipments from Posta na Severna Makedonija with Laravel and Yii framework support",
+    "description": "PHP package for tracking postal shipments from Posta na Makedonija with Laravel and Yii framework support",
     "type": "library",
     "keywords": ["postal", "tracking", "shipment", "macedonia", "posta", "laravel", "yii"],
     "license": "MIT",

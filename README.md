@@ -13,21 +13,118 @@ A PHP package for tracking postal shipments from Posta na Severna Makedonija wit
 - 🛡️ Error handling and validation
 - 📝 Comprehensive documentation
 
-## Installation
+## Installation & Setup
+
+### 📦 Installation
 
 ```bash
 composer require kalimeromk/postal-tracking
 ```
 
-## Native PHP Usage (No Framework Required!)
+### 🚀 Framework Setup
 
-### Installation
+<details>
+<summary><strong>Laravel Setup</strong></summary>
 
-```bash
-composer require kalimeromk/postal-tracking
+The package auto-registers its service provider. Use the facade:
+
+```php
+use KalimeroMK\PostalTracking\Facades\PostalTracking;
+
+// Track a shipment
+$result = PostalTracking::trackShipment('CQ117742716DE');
+
+// With options
+$result = PostalTracking::trackShipment('CQ117742716DE', [
+    'timeout' => 30,
+    'retry_attempts' => 3,
+    'transform' => true
+]);
 ```
 
-### Basic Usage
+**Publish config (optional):**
+
+```bash
+php artisan vendor:publish --provider="KalimeroMK\PostalTracking\Laravel\PostalTrackingServiceProvider"
+```
+
+**Controller example:**
+
+```php
+use KalimeroMK\PostalTracking\Facades\PostalTracking;
+
+class TrackingController extends Controller
+{
+    public function track(Request $request)
+    {
+        try {
+            $trackingCode = $request->get('tracking_code');
+            $result = PostalTracking::trackShipment($trackingCode);
+
+            return response()->json($result);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => $e->getMessage()
+            ], 422);
+        }
+    }
+}
+```
+
+</details>
+
+<details>
+<summary><strong>Yii Setup</strong></summary>
+
+Use the service directly in your controllers:
+
+```php
+use KalimeroMK\PostalTracking\Services\PostalTrackingService;
+
+// In your controller
+$service = new PostalTrackingService();
+$trackingData = $service->trackShipment('CQ117742716DE');
+
+// Return as JSON
+Yii::$app->response->format = Response::FORMAT_JSON;
+return $trackingData;
+```
+
+**Controller example:**
+
+```php
+use KalimeroMK\PostalTracking\Services\PostalTrackingService;
+
+class TrackingController extends Controller
+{
+    public function actionTrack()
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+
+        try {
+            $trackingCode = Yii::$app->request->get('tracking_code');
+            $service = new PostalTrackingService();
+            $result = $service->trackShipment($trackingCode);
+
+            return $result;
+        } catch (\Exception $e) {
+            Yii::$app->response->statusCode = 422;
+            return [
+                'success' => false,
+                'error' => $e->getMessage()
+            ];
+        }
+    }
+}
+```
+
+</details>
+
+<details>
+<summary><strong>Native PHP Setup</strong></summary>
+
+No framework required! Use directly:
 
 ```php
 <?php
@@ -43,7 +140,7 @@ echo json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
 ?>
 ```
 
-### Simple Tracker Class
+**Simple Tracker Class:**
 
 ```php
 <?php
@@ -111,7 +208,7 @@ if ($tracker->isValidCode('CQ117742716DE')) {
 ?>
 ```
 
-### Web Application Example
+**Web Application:**
 
 ```php
 <?php
@@ -144,13 +241,33 @@ if (isset($_GET['tracking_code'])) {
     <head>
         <title>Postal Tracking</title>
         <meta charset="UTF-8">
+        <style>
+            body { font-family: Arial, sans-serif; margin: 40px; }
+            .form-group { margin: 20px 0; }
+            input[type="text"] { padding: 10px; width: 300px; }
+            button { padding: 10px 20px; background: #007cba; color: white; border: none; cursor: pointer; }
+            button:hover { background: #005a87; }
+            .result { margin-top: 20px; padding: 20px; background: #f5f5f5; border-radius: 5px; }
+        </style>
     </head>
     <body>
         <h1>Track Your Package</h1>
         <form method="GET">
-            <input type="text" name="tracking_code" placeholder="CQ117742716DE" required>
-            <button type="submit">Track</button>
+            <div class="form-group">
+                <label for="tracking_code">Tracking Code:</label><br>
+                <input type="text" id="tracking_code" name="tracking_code"
+                       placeholder="CQ117742716DE" required>
+            </div>
+            <button type="submit">Track Package</button>
         </form>
+
+        <div class="result">
+            <h3>Example Tracking Codes:</h3>
+            <ul>
+                <li><strong>CQ117742716DE</strong> - Package from Germany</li>
+                <li><strong>RA123456789MK</strong> - Macedonian postal code format</li>
+            </ul>
+        </div>
     </body>
     </html>
     <?php
@@ -158,7 +275,7 @@ if (isset($_GET['tracking_code'])) {
 ?>
 ```
 
-### Command Line Usage
+**Command Line Usage:**
 
 ```php
 <?php
@@ -179,38 +296,27 @@ try {
     $result = $service->trackShipment($trackingCode);
 
     if ($result['success']) {
-        echo "Tracking successful!\n";
-        echo "Total events: " . count($result['data']) . "\n";
+        echo "✅ Tracking successful!\n";
+        echo "📦 Tracking Code: {$result['tracking_code']}\n";
+        echo "📊 Total events: " . count($result['data']) . "\n";
+        echo "🕒 Last update: {$result['metadata']['last_update']}\n\n";
 
-        foreach ($result['data'] as $event) {
-            echo "- {$event['Забелешка']} on {$event['Датум']}\n";
+        echo "📋 Tracking Events:\n";
+        foreach ($result['data'] as $index => $event) {
+            echo ($index + 1) . ". {$event['Забелешка']}\n";
+            echo "   📍 From: {$event['Од']}\n";
+            echo "   📍 To: {$event['До']}\n";
+            echo "   📅 Date: {$event['Датум']}\n\n";
         }
     }
 } catch (\Exception $e) {
-    echo "Error: " . $e->getMessage() . "\n";
+    echo "❌ Error: " . $e->getMessage() . "\n";
     exit(1);
 }
 ?>
 ```
 
-## Laravel Usage
-
-### Service Provider (Auto-registered)
-
-```php
-use KalimeroMK\PostalTracking\Facades\PostalTracking;
-
-$trackingData = PostalTracking::trackShipment('CQ117742716DE');
-```
-
-## Yii Usage
-
-```php
-use KalimeroMK\PostalTracking\Services\PostalTrackingService;
-
-$service = new PostalTrackingService();
-$trackingData = $service->trackShipment('CQ117742716DE');
-```
+</details>
 
 ## API Response Format
 
