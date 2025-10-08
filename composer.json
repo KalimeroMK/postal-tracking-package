@@ -1,0 +1,53 @@
+{
+    "name": "kalimeromk/postal-tracking",
+    "description": "PHP package for tracking postal shipments from Posta na Severna Makedonija with Laravel and Yii framework support",
+    "type": "library",
+    "keywords": ["postal", "tracking", "shipment", "macedonia", "posta", "laravel", "yii"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "KalimeroMK",
+            "email": "zbogoevski@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^8.1",
+        "ext-json": "*",
+        "ext-curl": "*"
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^3.0",
+        "phpstan/phpstan": "^2.1",
+        "phpunit/phpunit": "^10.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "KalimeroMK\\PostalTracking\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "KalimeroMK\\PostalTracking\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "KalimeroMK\\PostalTracking\\Laravel\\PostalTrackingServiceProvider"
+            ],
+            "aliases": {
+                "PostalTracking": "KalimeroMK\\PostalTracking\\Laravel\\Facades\\PostalTracking"
+            }
+        }
+    },
+    "scripts": {
+        "test": "phpunit",
+        "cs-fix": "php-cs-fixer fix",
+        "cs-check": "php-cs-fixer fix --dry-run --diff"
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
