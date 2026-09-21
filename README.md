@@ -105,7 +105,7 @@ The package auto-registers its service provider and facade. No additional config
 #### Basic Usage
 
 ```php
-use KalimeroMK\PostalTracking\Facades\PostalTracking;
+use KalimeroMK\PostalTracking\Laravel\Facades\PostalTracking;
 
 // Track a shipment
 $result = PostalTracking::trackShipment('CQ117742716DE');
@@ -125,7 +125,7 @@ $result = PostalTracking::trackShipment('CQ117742716DE', [
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use KalimeroMK\PostalTracking\Facades\PostalTracking;
+use KalimeroMK\PostalTracking\Laravel\Facades\PostalTracking;
 
 class TrackingController extends Controller
 {

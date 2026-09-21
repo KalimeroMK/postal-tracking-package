@@ -1,38 +1,6 @@
-# Dependencies
 /vendor/
-composer.phar
-
-# Environment files
-.env
-.env.local
-.env.production
-
-# IDE files
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-
-# OS files
-.DS_Store
-Thumbs.db
-
-# Logs
-*.log
-logs/
-
-# Cache
-cache/
-tmp/
-
-# PHPUnit
-.phpunit.result.cache
-coverage/
-
-# PHP CS Fixer
-.php-cs-fixer.cache
-
-# Build artifacts
-build/
-dist/
+/.idea
+composer.lock
+/.phpunit.cache
+/.phpunit.result.cache
+/.php-cs-fixer.cache
