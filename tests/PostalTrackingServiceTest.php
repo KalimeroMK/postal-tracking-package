@@ -35,13 +35,17 @@ class PostalTrackingServiceTest extends TestCase
 
     public function testValidateTrackingCodeWithValidFormat(): void
     {
-        // This test will fail with API call, but validation should pass
+        // A well-formed code must clear validation. The call still reaches the API,
+        // so it may succeed or raise a transport error - neither is a format error.
+        $thrown = null;
+
         try {
             $this->service->trackShipment('RA123456789MK');
         } catch (\Exception $e) {
-            // We expect an API exception, not validation exception
-            $this->assertNotInstanceOf(InvalidTrackingCodeException::class, $e);
+            $thrown = $e;
         }
+
+        $this->assertNotInstanceOf(InvalidTrackingCodeException::class, $thrown);
     }
 
     public function testServiceConfiguration(): void
